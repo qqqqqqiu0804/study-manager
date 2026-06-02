@@ -829,3 +829,49 @@ select.input {
     gap: 10px;
   }
 }
+
+/* File Upload */
+.file-upload-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-upload-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: var(--gray-100);
+  border: 2px dashed var(--gray-300);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--gray-600);
+  transition: all 0.2s;
+}
+
+.file-upload-label:hover {
+  background-color: var(--gray-200);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.loading-text {
+  font-size: 14px;
+  color: var(--primary);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.import-status.info {
+  background-color: #dbeafe;
+  color: #1e40af;
+}

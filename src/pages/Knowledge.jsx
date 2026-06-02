@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import mammoth from 'mammoth'
 import useStore from '../store/useStore'
 import KnowledgeCard from '../components/KnowledgeCard'
 
@@ -95,6 +96,50 @@ const Knowledge = () => {
   const [importText, setImportText] = useState('')
   const [parsedItems, setParsedItems] = useState([])
   const [importStatus, setImportStatus] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleFileImport = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    const fileName = file.name.toLowerCase()
+    setIsLoading(true)
+    setImportStatus({ type: 'info', message: `正在读取 ${file.name}...` })
+
+    try {
+      let text = ''
+
+      if (fileName.endsWith('.txt') || fileName.endsWith('.md')) {
+        // 读取纯文本和Markdown文件
+        text = await file.text()
+      } else if (fileName.endsWith('.docx')) {
+        // 读取Word文档
+        const arrayBuffer = await file.arrayBuffer()
+        const result = await mammoth.extractRawText({ arrayBuffer })
+        text = result.value
+      } else {
+        setImportStatus({ type: 'error', message: '不支持的文件格式，请使用 .txt、.md 或 .docx 文件' })
+        setIsLoading(false)
+        return
+      }
+
+      if (!text.trim()) {
+        setImportStatus({ type: 'error', message: '文件内容为空' })
+        setIsLoading(false)
+        return
+      }
+
+      setImportText(text)
+      setImportStatus({ type: 'success', message: `已读取 ${file.name}，共 ${text.length} 字` })
+    } catch (error) {
+      console.error('File import error:', error)
+      setImportStatus({ type: 'error', message: '文件读取失败，请重试' })
+    }
+
+    setIsLoading(false)
+    // 清除input的值，允许重复选择同一文件
+    e.target.value = ''
+  }
 
   const filteredKnowledge = useMemo(() => {
     let filtered = [...knowledge]
@@ -185,8 +230,9 @@ const Knowledge = () => {
         <div className="card smart-import-card">
           <h3>📥 智能导入知识点</h3>
           <p className="smart-import-desc">
-            粘贴一长串文字，自动识别标题层级并拆分知识点。
-            <br />支持格式：第一部分、一、二、三、1. 2. 3. 等
+            支持两种方式导入：
+            <br />1. 上传文件：支持 .txt、.md、.docx 格式
+            <br />2. 粘贴文字：直接粘贴复习资料
           </p>
 
           <div className="form-group">
@@ -206,7 +252,24 @@ const Knowledge = () => {
           </div>
 
           <div className="form-group">
-            <label>粘贴文字</label>
+            <label>上传文件</label>
+            <div className="file-upload-area">
+              <input
+                type="file"
+                accept=".txt,.md,.docx"
+                onChange={handleFileImport}
+                className="file-input"
+                id="file-import"
+              />
+              <label htmlFor="file-import" className="file-upload-label">
+                📄 选择文件（.txt、.md、.docx）
+              </label>
+              {isLoading && <span className="loading-text">读取中...</span>}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>或 粘贴文字</label>
             <textarea
               value={importText}
               onChange={(e) => setImportText(e.target.value)}
