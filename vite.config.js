@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/study-manager/',
+  base: process.env.NODE_ENV === 'production' ? '/study-manager/' : '/',
   server: {
     host: '0.0.0.0',
     port: 3000

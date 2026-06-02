@@ -1,9 +1,20 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import PomodoroTimer from './PomodoroTimer'
 
-const VERSION = '1.2.0'
+const VERSION = '1.3.0'
 
 const changelog = [
+  {
+    version: '1.3.0',
+    date: '2026-06-02',
+    changes: [
+      '新增学习统计页面：任务完成趋势、科目统计、知识点分布',
+      '新增番茄钟：专注计时器，支持自定义时间',
+      '新增复习提醒：浏览器通知提醒今日任务',
+      '新增版本更新日志'
+    ]
+  },
   {
     version: '1.2.0',
     date: '2026-06-02',
@@ -40,12 +51,14 @@ const changelog = [
 
 const Sidebar = ({ isOpen, onClose }) => {
   const [showChangelog, setShowChangelog] = useState(false)
+  const [showPomodoro, setShowPomodoro] = useState(false)
 
   const menuItems = [
     { path: '/', label: '仪表盘', icon: '📊' },
     { path: '/subjects', label: '科目管理', icon: '📚' },
     { path: '/tasks', label: '任务管理', icon: '✅' },
-    { path: '/knowledge', label: '知识点库', icon: '📝' }
+    { path: '/knowledge', label: '知识点库', icon: '📝' },
+    { path: '/statistics', label: '学习统计', icon: '📈' }
   ]
 
   return (
@@ -69,6 +82,22 @@ const Sidebar = ({ isOpen, onClose }) => {
             </NavLink>
           ))}
         </nav>
+
+        <div className="sidebar-tools">
+          <button
+            className="tool-btn"
+            onClick={() => setShowPomodoro(!showPomodoro)}
+          >
+            🍅 番茄钟
+          </button>
+        </div>
+
+        {showPomodoro && (
+          <div className="pomodoro-container">
+            <PomodoroTimer />
+          </div>
+        )}
+
         <div className="sidebar-footer">
           <button
             className="version-btn"
